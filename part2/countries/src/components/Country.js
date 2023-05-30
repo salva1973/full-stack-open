@@ -10,7 +10,10 @@ const Country = ({
   weather,
 }) => {
   const flagAlt = `Flag of ${commonName}`
-  const weatherIconUrl = `https://openweathermap.org/img/wn/${weather.main.icon}@2x.png`  
+  let weatherIconUrl
+  if (weather !== null) {
+    weatherIconUrl = `https://openweathermap.org/img/wn/${weather.main.icon}@2x.png`
+  }
 
   return (
     <>
@@ -24,11 +27,15 @@ const Country = ({
         ))}
       </ul>
       <img src={flagUrl} alt={flagAlt} className='flag' />
-      <h3>Weather in {capital}</h3>
-      <p>{capitalize(weather.main.description)}</p>
-      <img src={weatherIconUrl} alt='Weather Icon' />
-      <p>Temperature: {kelvinToCelsius(weather.temp.temp).toFixed(2)} °C</p>
-      <p>Wind: {weather.wind.speed} m/s</p>
+      {weather !== null && (
+        <>
+          <h3>Weather in {capital}</h3>
+          <p>{capitalize(weather.main.description)}</p>
+          <img src={weatherIconUrl} alt='Weather Icon' />
+          <p>Temperature: {kelvinToCelsius(weather.temp.temp).toFixed(2)} °C</p>
+          <p>Wind: {weather.wind.speed} m/s</p>
+        </>
+      )}
     </>
   )
 }

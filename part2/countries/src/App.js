@@ -10,6 +10,7 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState([])
   const [checkboxState, setCheckboxState] = useState(false)
+  const [checkboxWeatherState, setCheckboxWeatherState] = useState(false)
   const [weather, setWeather] = useState(null)
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const App = () => {
     }
   }, [countries])
 
-  const handleSearch = (term, checkboxStatus) => {
+  const handleSearch = (term, checkboxStatus, checkboxWeatherStatus) => {
     setSearchTerm(term)
     let selectedCountries = []
     if (countries.length !== 0 && term !== '') {
@@ -58,7 +59,8 @@ const App = () => {
     if (
       term !== '' &&
       selectedCountries.length === 1 &&
-      lastSearch !== selectedCountries[0].commonName
+      lastSearch !== selectedCountries[0].commonName &&
+      checkboxWeatherStatus
     ) {
       setLastSearch(selectedCountries[0].commonName)
       weatherService
@@ -81,13 +83,19 @@ const App = () => {
   }
 
   const handleSearchChange = event => {
-    handleSearch(event.target.value, checkboxState)
+    handleSearch(event.target.value, checkboxState, checkboxWeatherState)
   }
 
   const handleCheckboxChange = () => {
     const checkboxStatus = !checkboxState
     setCheckboxState(checkboxStatus)
-    handleSearch(searchTerm, checkboxStatus)
+    handleSearch(searchTerm, checkboxStatus, checkboxWeatherState)
+  }
+
+  const handleCheckboxWeatherChange = () => {
+    const checkboxWeatherStatus = !checkboxWeatherState
+    setCheckboxWeatherState(checkboxWeatherStatus)
+    handleSearch(searchTerm, checkboxState, checkboxWeatherStatus)
   }
 
   return (
@@ -108,14 +116,29 @@ const App = () => {
         onChange={handleCheckboxChange}
       />
       <label htmlFor='exact'> Exact match</label>
+      <input
+        type='checkbox'
+        id='weather'
+        name='weather'
+        value={checkboxWeatherState}
+        onChange={handleCheckboxWeatherChange}
+      />
+      <label htmlFor='weather'> Weather forecast</label>
       {searchTerm !== '' && filteredCountries.length > 1 && (
         <>
+          <br />
           <br />
           {filteredCountries.map(country => (
             <div key={country.commonName}>
               {country.commonName}{' '}
               <button
-                onClick={() => handleSearch(country.commonName, checkboxState)}
+                onClick={() =>
+                  handleSearch(
+                    country.commonName,
+                    checkboxState,
+                    checkboxWeatherState
+                  )
+                }
               >
                 show
               </button>
@@ -125,7 +148,7 @@ const App = () => {
         </>
       )}
 
-      {searchTerm !== '' && filteredCountries.length === 1 && weather && (
+      {searchTerm !== '' && filteredCountries.length === 1 && (
         <Country
           commonName={filteredCountries[0].commonName}
           capital={filteredCountries[0].capital}
